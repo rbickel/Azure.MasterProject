@@ -1,7 +1,10 @@
+
+#A comment
 resource "azurerm_resource_group" "rg" {
   name     = "rabickel-masteraks"
   location = "West Europe"
 }
+
 
 resource "azurerm_container_registry" "acr" {
   name                     = "rabickel-masteraks"
