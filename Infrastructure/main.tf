@@ -14,7 +14,7 @@ terraform {
     storage_account_name = "rbickeltfstate"
     container_name       = "terraform-state"
     key                  = "terraform.tfstate"
-  }  
+  }
 }
 
 provider "azurerm" {
