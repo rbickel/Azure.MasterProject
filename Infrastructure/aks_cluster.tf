@@ -17,7 +17,7 @@ resource "azurerm_kubernetes_cluster" "rabickelcluster" {
 }
 
 data "azurerm_user_assigned_identity" "rabickelclusterid" {
-  name                = "${azurerm_kubernetes_cluster.example.name}-agentpool"
+  name                = "${azurerm_kubernetes_cluster.rabickelcluster.name}-agentpool"
   resource_group_name = azurerm_kubernetes_cluster.rabickelcluster.node_resource_group
 }
 
@@ -33,5 +33,6 @@ output "client_certificate" {
 }
 
 output "kube_config" {
-  value = azurerm_kubernetes_cluster.rabickelcluster.kube_config_raw
+  value     = azurerm_kubernetes_cluster.rabickelcluster.kube_config_raw
+  sensitive = true
 }
