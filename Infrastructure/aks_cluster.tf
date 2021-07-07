@@ -16,6 +16,10 @@ resource "azurerm_kubernetes_cluster" "rabickelcluster" {
   identity {
     type = "SystemAssigned"
   }
+
+  provisioner "local-exec" {
+    command = "az aks command -c \"helm repo add ${azurerm_container_registry.acr.name} https://${azurerm_container_registry.acr.name}.azurecr.io && helm repo update\" -g ${azurerm_resource_group.rg.name} -n ${azurerm_kubernetes_cluster.rabickelcluster.name}"
+  }
 }
 
 data "azurerm_user_assigned_identity" "rabickelclusterid" {
