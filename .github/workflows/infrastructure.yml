@@ -4,7 +4,9 @@ on:
   push:
     branches:
     - main  
-  pull_request:
+    paths:
+      - "Infrastructure/**"
+      - ".github/workflows/infrastructure.yml"
 
 jobs:
   terraform:
