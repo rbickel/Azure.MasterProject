@@ -6,7 +6,7 @@ Master Azure project
 
 Infrastrucutre provisionning and state management with Terraform
 
-![Infrastructure deployment](https://github.com/rbickel/AKS.MasterProject/actions/workflows/infrastructure-provisioning.yml/badge.svg)
+![Infrastructure deployment](https://github.com/rbickel/Azure.MasterProject/actions/workflows/infrastructure-provisioning.yml/badge.svg)
 
 
 ## Kubeapi reverse proxy
