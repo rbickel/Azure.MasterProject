@@ -22,4 +22,4 @@ jobs:
           azcliversion: 2.0.72
           inlineScript: |
             DATE=$(date +"%Y%m")
-            az acr build --debug -r rabickelmasteraks -t payment/paymentapi:latestdev -t payment/paymentapi:$DATE_$GITHUB_RUN_NUMBER -t payment/paymentapi:$GITHUB_SHA $GITHUB_WORKSPACE/Application/PaymentAPI
+            az acr build -r rabickelmasteraks -t payment/paymentapi:latestdev -t payment/paymentapi:"$DATE.$GITHUB_RUN_NUMBER" -t payment/paymentapi:$GITHUB_SHA $GITHUB_WORKSPACE/Application/PaymentAPI
