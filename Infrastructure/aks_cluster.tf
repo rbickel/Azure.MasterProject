@@ -10,6 +10,7 @@ resource "azurerm_kubernetes_cluster" "rabickelcluster" {
     vm_size             = "standard_d2_v2"
     enable_auto_scaling = true
     max_count           = "10"
+    min_count           = "2"
   }
 
   identity {
