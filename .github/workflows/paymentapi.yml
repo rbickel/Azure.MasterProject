@@ -8,14 +8,16 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: ACR build
-        id: acr
-        uses: ams0/acr-task-github-action@v2
+      - name: Azure Login
+        uses: azure/login@v1
         with:
-          service_principal: ${{ secrets.ARM_CLIENT_ID }}
-          service_principal_password: ${{ secrets.ARM_CLIENT_SECRET }}
-          tenant: ${{ secrets.ARM_TENANT_ID }}
-          registry: rabickelmasteraks
-          repository: paymentapi
-          image: paymentapi
-          folder: ../../Application/PaymentAPI
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Azure CLI script file
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            az acr build -r rabickelmasteraks ../../Application/PaymentAPI
