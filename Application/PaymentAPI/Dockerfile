@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build-env
 WORKDIR /app
 
 # Restore and build
-COPY app/* /app
+COPY app/* /app/
 RUN dotnet restore /app
 RUN dotnet publish -c Release -o out
 

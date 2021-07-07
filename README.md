@@ -1,5 +1,5 @@
-# AKS.MasterProject
-Master AKS project
+# Azure.MasterProject
+Master Azure project
 
 
 ## Infrastructure
