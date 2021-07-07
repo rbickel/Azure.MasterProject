@@ -11,7 +11,8 @@ resource "azurerm_container_registry" "acr" {
   location                = azurerm_resource_group.rg.location
   sku                     = "Premium"
   admin_enabled           = false
-  zone_redundancy_enabled = false
+  zone_redundancy_enabled = true
   tags                    = {}
-  georeplications         = [{ "location" : "North Europe", "tags" : {}, "zone_redundancy_enabled" : false }, { "location" : "West Europe", "tags" : {}, "zone_redundancy_enabled" : false }]
+  #disabled geo-replication as it troubled the pipeline and always threw errors on brownfield
+  #georeplications         = [{ "location" : "North Europe", "tags" : {}, "zone_redundancy_enabled" : false }, { "location" : "West Europe", "tags" : {}, "zone_redundancy_enabled" : false }]
 }
