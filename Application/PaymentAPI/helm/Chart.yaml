@@ -1,0 +1,4 @@
+appVersion: "1.0.0"
+description: Deploy a payment API
+name: paymentapi
+version: 1.0.0

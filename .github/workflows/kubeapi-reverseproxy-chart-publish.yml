@@ -3,7 +3,7 @@ on:
   push:
     paths:
       - "Application/kubeapi-reverseproxy/**"
-      - ".github/workflows/kubeapi-reverseproxy.yml"
+      - ".github/workflows/kubeapi-reverseproxy-chart-publish.yml"
 jobs:
   build:
     runs-on: ubuntu-latest

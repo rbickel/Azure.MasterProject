@@ -3,7 +3,8 @@ on:
   push:
     paths:
       - "Application/PaymentAPI/app/**"
-      - ".github/workflows/paymentapi.yml"
+      - "Application/PaymentAPI/Dockerfile"
+      - ".github/workflows/paymentapi-docker-build-and-publish.yml"
 jobs:
   build:
     runs-on: ubuntu-latest
