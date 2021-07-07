@@ -1,0 +1,28 @@
+name: Secure Token Provider build
+on:
+  push:
+    paths:
+      - "Application/SecureTokenProvider/**"
+      - "Application/SecureTokenProvider/Dockerfile"
+      - ".github/workflows/securetokenprovider-docker-build-and-publish.yml"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Azure CLI script file
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.0.72
+          inlineScript: |
+            az acr build -r rabickelmasteraks -t payment/securetokenprovider:latestdev \
+                                              -t payment/securetokenprovider:"$(date +"%Y%m").$GITHUB_RUN_NUMBER" \
+                                              -t payment/securetokenprovider:$GITHUB_SHA \
+                                              $GITHUB_WORKSPACE/Application/SecureTokenProvider

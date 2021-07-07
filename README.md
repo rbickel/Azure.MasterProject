@@ -26,3 +26,5 @@ AspNet 5 WebAPI REST API.
 ## Secure Token Provider
 
 Azure function to exchange credit card details for a token to be used for payments. Credit card details are stored securely in a separate PCI-DSS compliant backend
+
+[![Docker build](https://github.com/rbickel/AKS.MasterProject/actions/workflows/securetokenprovider-docker-build-and-publish.yml/badge.svg)](https://github.com/rbickel/AKS.MasterProject/actions/workflows/securetokenprovider-docker-build-and-publish.yml)
