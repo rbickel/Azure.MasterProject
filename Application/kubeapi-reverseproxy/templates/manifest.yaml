@@ -62,6 +62,6 @@ data:
     stream {
         server {
             listen    443;
-            proxy_pass {{ .Values.kubeapiuri }}:443;
+            proxy_pass {{ .Values.kubeapi.uri }}:443;
         }
     }
