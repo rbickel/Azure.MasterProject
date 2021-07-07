@@ -20,4 +20,4 @@ jobs:
         uses: azure/CLI@v1
         with:
           inlineScript: |
-            az acr build -r rabickelmasteraks -t paymentapi:$GITHUB_RUN_ID -t paymentapi:$GITHUB_SHA /Application/PaymentAPI
+            az acr build -r rabickelmasteraks -t paymentapi:$GITHUB_RUN_ID -t paymentapi:$GITHUB_SHA $GITHUB_WORKSPACE/Application/PaymentAPI
