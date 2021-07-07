@@ -16,10 +16,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
 
-      - name: Lint Helm
+      - name: Helm Package
         uses: WyriHaximus/github-action-helm3@v2
         with:
-          exec: helm package --version "$(date +"%Y%m").$GITHUB_RUN_NUMBER" $GITHUB_WORKSPACE/PaymentAPI/helm
+          exec: helm package --version "$(date +"%Y%m").$GITHUB_RUN_NUMBER" $GITHUB_WORKSPACE/Application/PaymentAPI/helm
 
       - name: Push helm chart to ACR
         uses: azure/CLI@v1
