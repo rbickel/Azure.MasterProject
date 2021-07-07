@@ -1,0 +1,4 @@
+appVersion: "1.0.0"
+description: Kubeapi Nginx reverse proxy exposed behind an internal standard Load Balancer to be used through private link
+name: kubeapi-reverseproxy
+version: 1.0.0

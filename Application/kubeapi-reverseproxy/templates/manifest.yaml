@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx  
+    spec:
+      containers:
+      - image: nginx:1.21
+        imagePullPolicy: Always
+        name: nginx
+        ports:
+        - containerPort: 443
+        volumeMounts:
+          - mountPath: /etc/nginx/
+            name: nginx-config
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: nginx-configmap
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: nginx
+  name: nginx
+spec:
+  ports:
+  - port: 443
+    protocol: TCP
+    targetPort: 443
+  selector:
+    app: nginx
+  sessionAffinity: None
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-configmap
+data:
+  nginx.conf: |
+    user  nginx;
+    worker_processes  auto;
+
+    error_log  /var/log/nginx/error.log notice;
+    pid        /var/run/nginx.pid;
+
+    events {
+        worker_connections  1024;
+    }
+
+    stream {
+        server {
+            listen    443;
+            proxy_pass {{ .Values.kubeapiuri }}:443;
+        }
+    }
