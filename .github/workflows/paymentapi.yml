@@ -19,5 +19,6 @@ jobs:
       - name: Azure CLI script file
         uses: azure/CLI@v1
         with:
+          azcliversion: 2.0.72
           inlineScript: |
             az acr build --debug -r rabickelmasteraks -t payment/paymentapi:latestdev -t payment/paymentapi:$GITHUB_RUN_ID -t payment/paymentapi:$GITHUB_SHA $GITHUB_WORKSPACE/Application/PaymentAPI
