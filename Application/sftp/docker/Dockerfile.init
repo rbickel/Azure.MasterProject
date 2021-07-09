@@ -1,0 +1,7 @@
+FROM mcr.microsoft.com/azure-cli
+
+COPY ./entrypoint.init /entrypoint
+
+RUN chmod +x /entrypoint 
+
+ENTRYPOINT ["bash", "/entrypoint"]

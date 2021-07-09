@@ -1,0 +1,31 @@
+name: Payment Api build
+on:
+  push:
+    paths:
+      - "Application/sftp/docker/**"
+      - ".github/workflows/sftp-docker-build-and-publish.yml"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Azure CLI script file
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.0.72
+          inlineScript: |
+            az acr build -r rabickelmasteraks -t sftp/sftp:latestdev \
+                                              -t sftp/sftp:"$(date +"%Y%m").$GITHUB_RUN_NUMBER" \
+                                              -t sftp/sftp:$GITHUB_SHA \
+                                              $GITHUB_WORKSPACE/Application/sftp/docker
+            az acr build -r rabickelmasteraks -f Dockerfile.init -t sftp/init:latest \
+                                              -t sftp/init:"$(date +"%Y%m").$GITHUB_RUN_NUMBER" \
+                                              -t sftp/init:$GITHUB_SHA \
+                                              $GITHUB_WORKSPACE/Application/sftp/docker                                              

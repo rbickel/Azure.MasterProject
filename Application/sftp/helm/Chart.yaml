@@ -1,0 +1,4 @@
+appVersion: "1.0.0"
+description: SFTP Server with mounted Azure Files and reading user credentials from KeyVault
+name: aks-sftp
+version: 1.0.0

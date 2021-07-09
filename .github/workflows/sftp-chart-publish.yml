@@ -1,0 +1,29 @@
+name: payment api helm chart push to ACR
+on:
+  push:
+    paths:
+      - "Application/sftp/helm"
+      - ".github/workflows/sftp-chart-publish.yml"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Helm Package
+        uses: WyriHaximus/github-action-helm3@v2
+        with:
+          exec: helm package --version "$(date +"%Y%m").$GITHUB_RUN_NUMBER" $GITHUB_WORKSPACE/Application/sftp/helm
+
+      - name: Push helm chart to ACR
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.0.72
+          inlineScript: |
+            az acr helm push -n rabickelmasteraks sftp-"$(date +"%Y%m").$GITHUB_RUN_NUMBER".tgz --force

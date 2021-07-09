@@ -1,0 +1,1 @@
+{{- define "users" -}}{{- range .Values.sftpserver.users }}{{ print . " " }}{{- end }}{{- end }}

@@ -1,0 +1,40 @@
+#!/bin/bash
+#Init script that creates personal Azure storage file shares for every sftp user
+set -Eeo pipefail
+
+# shellcheck disable=2154
+trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
+
+reUser='[A-Za-z0-9._][A-Za-z0-9._-]{0,31}' # POSIX.1-2008
+
+function log() {
+    echo "[$0] $*" >&2
+}
+
+function validateArg() {
+    name="$1"
+    val="$2"
+    re="$3"
+
+    if [[ "$val" =~ ^$re$ ]]; then
+        return 0
+    else
+        log "ERROR: Invalid $name \"$val\", do not match required regex pattern: $re"
+        return 1
+    fi
+}
+
+if [ -n "$SFTP_USERS" ]; then
+    # Append users from environment variable to final config
+    IFS=" " read -r -a usersFromEnv <<< "$SFTP_USERS"
+    for user in "${usersFromEnv[@]}"; do
+
+        log "Parsing user input"
+        IFS=':' read -ra args <<< "$user"
+        u="${args[0]}"; validateArg "username" "$u" "$reUser" || exit 1
+        log "Creating fileshare for: \"$u\""
+        az storage share create --name "$u" \
+                        --account-name $azurestorageaccountname \
+                        --account-key $azurestorageaccountkey
+    done
+fi

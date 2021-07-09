@@ -1,0 +1,35 @@
+{{- range .Values.sftpserver.users }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ first (regexSplit ":" . -1) }}
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+  azureFile:
+    secretName: {{ $.Release.Name }}-filestore
+    shareName: {{ first (regexSplit ":" . -1) }}
+    readOnly: false
+  mountOptions:
+    - dir_mode=0755
+    - file_mode=0755
+    - uid={{ (split ":" . )._2 }}
+    - gid={{ (split ":" . )._3 }}
+    - mfsymlinks
+    - nobrl
+---    
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ first (regexSplit ":" . -1) }}
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: ""
+  resources:
+    requests:
+      storage: 5Gi 
+---         
+{{- end }}
