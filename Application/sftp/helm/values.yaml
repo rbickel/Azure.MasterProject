@@ -3,7 +3,8 @@ storage:
   accountKey: Ho5nLjQR0VgkrUclalCleDdrI7KcwEM6CzM0GXLfS2MDWFNaveOnMuaokN/YShBQfJMDzKfOUf/W337i00wl7A==
 
 sftpserver:
-  image: rabickelmasteraks.azurecr.io/sftp:latest
+  image: rabickelmasteraks.azurecr.io/sftp/sftp:latestdev
+  init_image: rabickelmasteraks.azurecr.io/sftp/sftp:init
   users:
   - "user1:password:1001:1007:upload"
   - "user2:password:1002:1007:upload"

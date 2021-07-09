@@ -14,7 +14,7 @@ spec:
     spec:
       initContainers:
       - name: {{ .Release.Name }}-init
-        image: rabickelmasteraks.azurecr.io/sftp:init
+        image: {{ .Values.sftpserver.image_init }}
         env:
         - name: SFTP_USERS
           valueFrom:
