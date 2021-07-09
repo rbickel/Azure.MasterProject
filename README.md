@@ -31,7 +31,7 @@ Azure function to exchange credit card details for a token to be used for paymen
 
 ## SFTP
 
-(SFTP README)[./Application/sftp/README.md]
+[SFTP README](./Application/sftp/README.md)
 
 
 [![Docker build](https://github.com/rbickel/AKS.MasterProject/actions/workflows/sftp-docker-build-and-publish.yml/badge.svg)](https://github.com/rbickel/AKS.MasterProject/actions/workflows/sftp-docker-build-and-publish.yml)
