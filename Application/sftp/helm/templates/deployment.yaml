@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: {{ .Release.Name }}-deployment
 spec:
-  replicas: 5
+  replicas: {{ .Values.sftpserver.replicas }}
   selector:
     matchLabels:
       app: {{ .Release.Name }}-deployment

@@ -4,10 +4,11 @@ storage:
 
 sftpserver:
   image: rabickelmasteraks.azurecr.io/sftp/sftp:latestdev
-  init_image: rabickelmasteraks.azurecr.io/sftp/sftp:init
+  init_image: rabickelmasteraks.azurecr.io/sftp/init:latest
   users:
   - "user1:password:1001:1007:upload"
   - "user2:password:1002:1007:upload"
+  replicas: 2
 
 service:
   type: LoadBalancer
