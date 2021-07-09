@@ -1,8 +1,8 @@
-name: payment api helm chart push to ACR
+name: SFTP helm chart push to ACR
 on:
   push:
     paths:
-      - "Application/sftp/helm"
+      - "Application/sftp/helm/**"
       - ".github/workflows/sftp-chart-publish.yml"
 jobs:
   build:

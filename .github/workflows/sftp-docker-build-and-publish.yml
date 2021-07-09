@@ -1,4 +1,4 @@
-name: Payment Api build
+name: SFTP build
 on:
   push:
     paths:
