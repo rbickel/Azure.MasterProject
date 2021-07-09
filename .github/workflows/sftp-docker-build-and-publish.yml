@@ -25,7 +25,8 @@ jobs:
                                               -t sftp/sftp:"$(date +"%Y%m").$GITHUB_RUN_NUMBER" \
                                               -t sftp/sftp:$GITHUB_SHA \
                                               $GITHUB_WORKSPACE/Application/sftp/docker
-            az acr build -r rabickelmasteraks -f Dockerfile.init -t sftp/init:latest \
+            az acr build -r rabickelmasteraks -f $GITHUB_WORKSPACE/Application/sftp/docker/Dockerfile.init \
+                                              -t sftp/init:latest \
                                               -t sftp/init:"$(date +"%Y%m").$GITHUB_RUN_NUMBER" \
                                               -t sftp/init:$GITHUB_SHA \
                                               $GITHUB_WORKSPACE/Application/sftp/docker                                              
