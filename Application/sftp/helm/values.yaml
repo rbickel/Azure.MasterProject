@@ -1,9 +1,13 @@
 storage:
+  #SFTP Storage account name
   accountName: rabickelaudit
+  #SFTP Storage account key
   accountKey: Ho5nLjQR0VgkrUclalCleDdrI7KcwEM6CzM0GXLfS2MDWFNaveOnMuaokN/YShBQfJMDzKfOUf/W337i00wl7A==
 
 sftpserver:
-  image: rabickelmasteraks.azurecr.io/sftp/sftp:latestdev
+  #https://github.com/atmoz/sftp
+  image: atmoz/sftp:latest
+  #init container is only used to create the different file shares on Azure Storage
   init_image: rabickelmasteraks.azurecr.io/sftp/init:latest
   users:
   - "user1:password:1001:1007:upload"

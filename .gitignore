@@ -7,3 +7,5 @@ out/
 terraform.exe
 terraform.tfstate
 terraform.tfstate.backup
+.fake
+.ionide

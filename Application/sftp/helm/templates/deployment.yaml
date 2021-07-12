@@ -15,6 +15,7 @@ spec:
       initContainers:
       - name: {{ .Release.Name }}-init
         image: {{ .Values.sftpserver.init_image }}
+        imagePullPolicy: "Always"
         env:
         - name: SFTP_USERS
           valueFrom:
