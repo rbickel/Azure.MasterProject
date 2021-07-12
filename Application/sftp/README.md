@@ -1,9 +1,7 @@
 
 ## Introduction
 
-SFTP servers on AKS with an Azure Storage account, and user credentials pulled from KeyVault at installation time. Solution uses docker image from https://github.com/atmoz/sftp
-
-Inspired by https://github.com/usri/sftp-on-aci
+This project create an helm chart to run as sftp server in AKS, using Azrue Storage account as filestore. The solution uses this project as its sftp implementation: https://github.com/atmoz/sftp 
 
 ```yaml
 #Helm values:
