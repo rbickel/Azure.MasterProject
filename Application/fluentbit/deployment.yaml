@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fluentbitsidecar-deployment
+spec:
+  selector:
+    matchLabels:
+      app: fluentbitsidecar-deployment
+  template:
+    metadata:
+      labels:
+        app: fluentbitsidecar-deployment
+    spec:     
+      volumes:
+      - name: shared-data
+        emptyDir: {}
+      - name: config-volume
+        configMap:
+          # Indiquez le nom de la ConfigMap contenant les fichiers que vous souhaitez ajouter au conteneur
+          name: fluentbit-config     
+
+      containers:
+      # write stuff to a log file in a custom format
+      - name: logproducer
+        image: busybox:latest
+        imagePullPolicy: "IfNotPresent"
+        command: ["/bin/sh"]
+        args: ["-c", "while true ; do echo $(date +%Y-%m-%d_%H:%M) user1 404 this is my super message  >> /mnt/temp/logs.log ; sleep 30 ; done"]        
+        volumeMounts:
+        - name: shared-data
+          mountPath: /mnt/temp
+
+      # side car that parse and forward the logs according to its config
+      - name: fluentsidecar
+        image: fluent/fluent-bit:latest
+        imagePullPolicy: "IfNotPresent"
+        volumeMounts:
+        - name: shared-data
+          mountPath: /mnt/temp        
+        - name: config-volume
+          mountPath: /fluent-bit/etc
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluentbit-config
+data:
+  # fluent-bit config
+  fluent-bit-parser.conf: |        
+    [PARSER]
+        Name   custom
+        Format regex
+        Regex  ^(?<time>[^ ]*) [^ ]* (?<user>[^ ]*) (?<code>[^ ]*) (?<message>.*) 
+        Time_Key time
+        Time_Format %Y-%m-%d_%H:%M
+        Types code:integer
+  fluent-bit.conf: |
+    [SERVICE]
+        Parsers_File /fluent-bit/etc/fluent-bit-parser.conf
+    [INPUT]
+        Name tail
+        Path /mnt/temp/*.log
+        Tag  varlog.*
+        Parser custom
+
+    [OUTPUT]
+        Name        azure
+        Match       *
+        Customer_ID 0cc92541-452b-4646-a705-6e1c53709730
+        Shared_Key  BgUzqCR/3tLyZXnkL8dN6FA6lKBIo/9vTpo0Ob6jJuyEzKhL6GMQG/bcQIvfIqMUe/s0/MwOM/lH+o8t3MnM3g==
