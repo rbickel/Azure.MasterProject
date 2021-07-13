@@ -1,4 +1,4 @@
-name: SFTP build
+name: SFTP init container image build
 on:
   push:
     paths:
