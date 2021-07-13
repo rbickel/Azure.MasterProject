@@ -1,3 +1,8 @@
+# SFTP helm chart
+
+[![Docker build](https://github.com/rbickel/AKS.MasterProject/actions/workflows/sftp-docker-build-and-publish.yml/badge.svg)](https://github.com/rbickel/AKS.MasterProject/actions/workflows/sftp-docker-build-and-publish.yml)
+
+[![Helm publish](https://github.com/rbickel/AKS.MasterProject/actions/workflows/sftp-chart-publish.yml/badge.svg)](https://github.com/rbickel/AKS.MasterProject/actions/workflows/sftp-chart-publish.yml)
 
 ## Introduction
 
