@@ -12,11 +12,10 @@ spec:
         app: fluentbitsidecar-deployment
     spec:     
       volumes:
-      - name: shared-data
+      - name: logs-volume
         emptyDir: {}
       - name: config-volume
         configMap:
-          # Indiquez le nom de la ConfigMap contenant les fichiers que vous souhaitez ajouter au conteneur
           name: fluentbit-config     
 
       containers:
@@ -27,7 +26,7 @@ spec:
         command: ["/bin/sh"]
         args: ["-c", "while true ; do echo $(date +%Y-%m-%d_%H:%M) user1 404 this is my super message  >> /mnt/logs/logs.log ; sleep 30 ; done"]        
         volumeMounts:
-        - name: shared-data
+        - name: logs-volume
           mountPath: /mnt/logs
 
       # side car that parse and forward the logs according to its config
@@ -35,7 +34,7 @@ spec:
         image: fluent/fluent-bit:latest
         imagePullPolicy: "IfNotPresent"
         volumeMounts:
-        - name: shared-data
+        - name: logs-volume
           mountPath: /mnt/logs        
         - name: config-volume
           mountPath: /fluent-bit/etc
@@ -50,13 +49,14 @@ data:
     [PARSER]
         Name   custom
         Format regex
-        Regex  ^(?<time>[^ ]*) [^ ]* (?<user>[^ ]*) (?<code>[^ ]*) (?<message>.*) 
+        Regex  ^(?<time>[^ ]*) (?<user>[^ ]*) (?<code>[^ ]*) (?<message>.*)$
         Time_Key time
         Time_Format %Y-%m-%d_%H:%M
         Types code:integer
   fluent-bit.conf: |
     [SERVICE]
         Parsers_File /fluent-bit/etc/fluent-bit-parser.conf
+
     [INPUT]
         Name tail
         Path /mnt/logs/*.log
