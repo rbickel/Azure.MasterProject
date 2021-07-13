@@ -24,7 +24,8 @@ sftpserver:
   #init container is only used to create the different file shares on Azure Storage. A file share with the user name is created and mounted for the user
   init_image: rabickelmasteraks.azurecr.io/sftp/init:latest
   
-  # users are injected are upgrade time. If new users need to be added, helm upgrade with the new value is required
+  # users are injected are upgrade time. If new users need to be added, helm upgrade with the new value is required.
+  # 'upload' dir is hardcoded in the helm chart so cannot be changed in this version. Needs to has the value 'upload'
   users:
   - "user1:password:1001:1007:upload"
   - "user2:password:1002:1007:upload"
@@ -50,7 +51,8 @@ Connect-AzAccount
 ```powershell
 # powershell script to retrieve sftp users from KeyVault.
 # Secret values must be in format: username:password:uid:gid:dir
-# e.g.: raphael:MyP@ssw0rd:1001:1001:uploaddir
+# Dir must be of value 'upload' as hardcoded in the helm chart
+# e.g.: raphael:MyP@ssw0rd:1001:1001:upload
 
 $keyvaultname="rabickelvlt"
 $secrets = New-Object Collections.Generic.List[String]
