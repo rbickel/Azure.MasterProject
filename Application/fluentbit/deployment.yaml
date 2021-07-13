@@ -25,10 +25,10 @@ spec:
         image: busybox:latest
         imagePullPolicy: "IfNotPresent"
         command: ["/bin/sh"]
-        args: ["-c", "while true ; do echo $(date +%Y-%m-%d_%H:%M) user1 404 this is my super message  >> /mnt/temp/logs.log ; sleep 30 ; done"]        
+        args: ["-c", "while true ; do echo $(date +%Y-%m-%d_%H:%M) user1 404 this is my super message  >> /mnt/logs/logs.log ; sleep 30 ; done"]        
         volumeMounts:
         - name: shared-data
-          mountPath: /mnt/temp
+          mountPath: /mnt/logs
 
       # side car that parse and forward the logs according to its config
       - name: fluentsidecar
@@ -36,7 +36,7 @@ spec:
         imagePullPolicy: "IfNotPresent"
         volumeMounts:
         - name: shared-data
-          mountPath: /mnt/temp        
+          mountPath: /mnt/logs        
         - name: config-volume
           mountPath: /fluent-bit/etc
 ---
@@ -59,7 +59,7 @@ data:
         Parsers_File /fluent-bit/etc/fluent-bit-parser.conf
     [INPUT]
         Name tail
-        Path /mnt/temp/*.log
+        Path /mnt/logs/*.log
         Tag  varlog.*
         Parser custom
 
