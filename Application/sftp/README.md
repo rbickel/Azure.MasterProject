@@ -6,7 +6,7 @@
 
 ## Introduction
 
-This project create an helm chart to run as sftp server in AKS, using Azrue Storage account as filestore. The solution uses this project as its sftp implementation: https://github.com/atmoz/sftp 
+This project create an helm chart to run as sftp server in AKS, using Azure Storage account as filestore. The solution uses this project as its OpenSSH SFTP implementation: https://github.com/atmoz/sftp 
 
 ```yaml
 #Helm values:
