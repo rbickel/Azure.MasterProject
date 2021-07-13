@@ -13,8 +13,8 @@ spec:
     shareName: {{ first (regexSplit ":" . -1) }}
     readOnly: false
   mountOptions:
-    - dir_mode=0755
-    - file_mode=0755
+    - dir_mode=0700
+    - file_mode=0700
     - uid={{ (split ":" . )._2 }}
     - gid={{ (split ":" . )._3 }}
     - mfsymlinks
