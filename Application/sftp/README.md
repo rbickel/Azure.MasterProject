@@ -17,10 +17,14 @@ storage:
   accountKey: Ho5nLjQR0VgkrUclalCleDdrI7KcwEM6CzM0GXLfS2MDWFNaveOnMuaokN/YShBQfJMDzKfOUf/W337i00wl7A==
 
 sftpserver:
+  
   #https://github.com/atmoz/sftp
   image: atmoz/sftp:latest
-  #init container is only used to create the different file shares on Azure Storage
+  
+  #init container is only used to create the different file shares on Azure Storage. A file share with the user name is created and mounted for the user
   init_image: rabickelmasteraks.azurecr.io/sftp/init:latest
+  
+  # users are injected are upgrade time. If new users need to be added, helm upgrade with the new value is required
   users:
   - "user1:password:1001:1007:upload"
   - "user2:password:1002:1007:upload"
@@ -28,7 +32,7 @@ sftpserver:
 
 service:
   type: LoadBalancer
-  private: false  
+  private: false  #Will create a public/private Load Balancer to expose the SFTP service. Needs to be set to false if the type is different than 'LoadBalancer'
 
 ```
 
