@@ -48,7 +48,7 @@ Connect-AzAccount
 
 ### Query SFTP user credentials from KeyVault and inject them as helm chart value. 
 ```powershell
-#retrieve sftp users from KeyVault.
+# powershell script to retrieve sftp users from KeyVault.
 # Secret values must be in format: username:password:uid:gid:dir
 # e.g.: raphael:MyP@ssw0rd:1001:1001:uploaddir
 
