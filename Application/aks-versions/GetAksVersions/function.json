@@ -1,0 +1,27 @@
+{
+  "bindings": [
+    {
+      "authLevel": "function",
+      "type": "httpTrigger",
+      "direction": "in",
+      "name": "Request",
+      "methods": [
+        "get",
+        "post"
+      ]
+    },
+    {
+      "type": "http",
+      "direction": "out",
+      "name": "Response"
+    },
+    {
+      "name": "CacheInput",
+      "type": "blob",
+      "path": "cache/aksversions.cache",
+      "connection": "AzureWebJobsStorage",
+      "direction": "in",
+      "dataType": "string"
+    }
+  ]
+}

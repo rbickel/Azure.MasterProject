@@ -1,0 +1,17 @@
+{
+  "bindings": [
+    {
+      "name": "Timer",
+      "type": "timerTrigger",
+      "direction": "in",
+      "schedule": "0 0 * * * *"
+    },
+    {
+      "name": "CacheOutput",
+      "type": "blob",
+      "path": "cache/aksversions.cache",
+      "connection": "AzureWebJobsStorage",
+      "direction": "out"
+    }
+  ]
+}
