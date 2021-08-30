@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: clamav
+  labels:
+    k8s-app: clamav-host-scanner
+spec:
+  selector:
+    matchLabels:
+      name: clamav
+  template:
+    metadata:
+      labels:
+        name: clamav
+    spec:
+      containers:
+      - name: clamav-scanner
+        image: mkodockx/docker-clamav:alpine
+        ports:
+          - containerPort: 3310
+        resources:
+          limits:
+            cpu: 500m
+            memory: 3Gi
+          requests:
+            cpu: 500m
+            memory: 2Gi
+        volumeMounts:
+        - name: host-fs
+          mountPath: /host-fs
+          readOnly: true        
+        - name: virus-definition
+          mountPath: /var/lib/clamav
+        - name: logs
+          mountPath: /var/log/clamav
+        livenessProbe:
+          periodSeconds: 10
+          exec:
+            command:
+              - "/bin/sh"
+              - "-c"
+              - "./check.sh"
+        readinessProbe:
+          initialDelaySeconds: 15
+          exec:
+            command:
+              - "/bin/sh"
+              - "-c"
+              - "./check.sh"
+      volumes:
+      - name: host-fs
+        hostPath:
+          path: /
+      - name: logs
+        emptyDir: {}
+      - name: virus-definition
+        emptyDir: {}
