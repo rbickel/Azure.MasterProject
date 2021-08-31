@@ -1,3 +1,15 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: virusdefinition-pvc
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: managed-premium
+  resources:
+    requests:
+      storage: 5Gi
+---
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -20,11 +32,11 @@ spec:
           - containerPort: 3310
         resources:
           limits:
-            cpu: 500m
-            memory: 3Gi
+            cpu: "1"
+            memory: 1.5Gi
           requests:
-            cpu: 500m
-            memory: 2Gi
+            cpu: "1"
+            memory: 1.5Gi
         volumeMounts:
         - name: host-fs
           mountPath: /host-fs
@@ -36,22 +48,18 @@ spec:
         livenessProbe:
           periodSeconds: 10
           exec:
-            command:
-              - "/bin/sh"
-              - "-c"
-              - "./check.sh"
+            command: ["/check.sh"]
         readinessProbe:
-          initialDelaySeconds: 15
+          initialDelaySeconds: 60
           exec:
-            command:
-              - "/bin/sh"
-              - "-c"
-              - "./check.sh"
+            command: ["/check.sh"]
       volumes:
       - name: host-fs
         hostPath:
           path: /
       - name: logs
-        emptyDir: {}
+        persistentVolumeClaim:
+          claimName: virusdefinition-pvc
       - name: virus-definition
-        emptyDir: {}
+        persistentVolumeClaim:
+          claimName: virusdefinition-pvc
