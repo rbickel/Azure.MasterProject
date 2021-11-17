@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sslsidecar-deployment
+spec:
+  selector:
+    matchLabels:
+      app: sslsidecar-deployment
+  template:
+    metadata:
+      labels:
+        app: sslsidecar-deployment
+    spec:
+      volumes:
+      - name: cert
+        secret:
+          secretName: ssl-cert
+      - name: config
+        configMap:
+          name: nginx-config
+      containers:
+      # write stuff to a log file in a custom format
+      - name: website
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+      - name: sslsidecar
+        image: nginx:latest
+        imagePullPolicy: "IfNotPresent"
+        ports:
+        - containerPort: 443
+        volumeMounts:
+        - name: cert
+          mountPath: "/etc/nginx/ssl"
+          readOnly: true
+        - name: config
+          mountPath: "/etc/nginx/conf.d"
+          readOnly: true          
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sslsidecar-deployment
+  labels:
+    app: sslsidecar-deployment
+spec:
+  type: LoadBalancer  
+  ports:
+  - port: 443
+    protocol: TCP
+    targetPort: 443
+  selector:
+    app: sslsidecar-deployment
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+data:
+  default.conf: |
+    server {
+      listen              443 ssl;
+
+      ssl_certificate     /etc/nginx/ssl/rbkl.crt;
+      ssl_certificate_key /etc/nginx/ssl/rbkl.key;
+      ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
+      ssl_ciphers         HIGH:!aNULL:!MD5;
+
+      access_log            /var/log/nginx/access.log;
+
+      location / {
+
+        proxy_set_header        Host $host;
+        proxy_set_header        X-Real-IP $remote_addr;
+        proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header        X-Forwarded-Proto $scheme;
+
+        proxy_pass          http://localhost:80;
+        proxy_read_timeout  90;
+
+        proxy_redirect      http://localhost:80 rbkl.local;
+      }
+    } 
+---    
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ssl-cert
+  namespace: default
+type: Opaque
+data:
+  rbkl.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUQyekNDQXNPZ0F3SUJBZ0lVSnRoaVNtNVplbGQrVng0RzVYOXRFUUttRkU4d0RRWUpLb1pJaHZjTkFRRUwKQlFBd2ZURUxNQWtHQTFVRUJoTUNRMGd4RHpBTkJnTlZCQWdNQmtkbGJtVjJZVEVPTUF3R0ExVUVCd3dGUjJWdQpaV0V4RFRBTEJnTlZCQW9NQkZKQ1Mwd3hEREFLQmdOVkJBc01BMWRsWWpFVE1CRUdBMVVFQXd3S2NtSnJiQzVzCmIyTmhiREViTUJrR0NTcUdTSWIzRFFFSkFSWU1hVzVtYjBCeVltdHNMbWx2TUI0WERUSXhNVEV4TnpBNU1qVTEKTmxvWERUSXlNVEV4TnpBNU1qVTFObG93ZlRFTE1Ba0dBMVVFQmhNQ1EwZ3hEekFOQmdOVkJBZ01Ca2RsYm1WMgpZVEVPTUF3R0ExVUVCd3dGUjJWdVpXRXhEVEFMQmdOVkJBb01CRkpDUzB3eEREQUtCZ05WQkFzTUExZGxZakVUCk1CRUdBMVVFQXd3S2NtSnJiQzVzYjJOaGJERWJNQmtHQ1NxR1NJYjNEUUVKQVJZTWFXNW1iMEJ5WW10c0xtbHYKTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUF3TVRWY010TFJocjJPalJ4TFFRRQpaMVF5TFJPSGFXYmpuUm9sSExEZmd5QS8rNDdIQm56Y0hNWHpYN3lJZFUvS0FBbE4yUzQ5dDFSV0tSVWJsOHlrCm5qR2V1aW42SEdMMjRkY0N4dXc3eWxUdGVVUlJDeUtxYzFLS2hXUFJZVTROWHoxL3lxa29XdGZESktWMnJxVlMKL1A4ZEVqSThFVEJWTDVsbW9IVVRHcFVlSzErM2Z0dG5TNml5WjdSVFhURUY4aGJ3UTd6eFQzbVU1YmNnOXZpTwovR1ZsVFp0YU8xRm55d055V3IrcUZMbmxSMlBMdWdxeWpzR1VCSklkc0czbHp2MS85UUNKb3pLWWNpT2wzdEU2Cm5OSjhhekdwWmgyN2pIYkdsdWtlcUY4ck8zVnoyM3BkR0o5ZFFyNzh3eitheWNxc1c5UHNxTThRWERUWEV3MkMKRVFJREFRQUJvMU13VVRBZEJnTlZIUTRFRmdRVTdCRFpFcldZR1BFN3p1L1FycFMvZ0ZyTXNVSXdId1lEVlIwagpCQmd3Rm9BVTdCRFpFcldZR1BFN3p1L1FycFMvZ0ZyTXNVSXdEd1lEVlIwVEFRSC9CQVV3QXdFQi96QU5CZ2txCmhraUc5dzBCQVFzRkFBT0NBUUVBb2ZXRlIyMExpaVpBZjFPbEZyWGZYZFl6S1BLOUdPbUxiZENyc2tzdTUrUGUKVmY1MVc3VHpSMDNScU1NRVYrNExiMnA4WkpPQUVPM0pCNHVURGJnV0FkVmcxeSt1anNSUHRBTUNDMWhPUFdVNApJQ0NjSzZsUVlhRFBFbUtucWlhMXA5R0VUVTB3ZTluenE0Y3R2ZWNVWHpMcDhpaFA0TFB2U0lQMzF6TGtManFGClFZL2VoZkduTTM0eTA5Mlp0cGROWW8yWGlMYWk2Tno0VFBNdU1pVzJ6WFAxQ0hkOWZJYTJUVE5vUnN1T1RwSS8KZ2xhc1I0bElna0VxN0h6b2lhTjBjbUcyc0UvOFErdlpLNnQreVNPQW5mRklEU3pTVVJIZ2krZ1FUWFBhTnpybwpRYlJRT3Y4S3BLREUyL2l3OG1HZGFLaXUwb3k0VkdDVUlOcTZRYlkrVFE9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+  rbkl.key: LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV2UUlCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQktjd2dnU2pBZ0VBQW9JQkFRREF4TlZ3eTB0R0d2WTYKTkhFdEJBUm5WREl0RTRkcFp1T2RHaVVjc04rRElELzdqc2NHZk53Y3hmTmZ2SWgxVDhvQUNVM1pMajIzVkZZcApGUnVYektTZU1aNjZLZm9jWXZiaDF3TEc3RHZLVk8xNVJGRUxJcXB6VW9xRlk5RmhUZzFmUFgvS3FTaGExOE1rCnBYYXVwVkw4L3gwU01qd1JNRlV2bVdhZ2RSTWFsUjRyWDdkKzIyZExxTEpudEZOZE1RWHlGdkJEdlBGUGVaVGwKdHlEMitJNzhaV1ZObTFvN1VXZkxBM0phdjZvVXVlVkhZOHU2Q3JLT3daUUVraDJ3YmVYTy9YLzFBSW1qTXBoeQpJNlhlMFRxYzBueHJNYWxtSGJ1TWRzYVc2UjZvWHlzN2RYUGJlbDBZbjExQ3Z2ekRQNXJKeXF4YjAreW96eEJjCk5OY1REWUlSQWdNQkFBRUNnZ0VBTzlWY3d0UDNHMTJIQyszM0t4ZlNIaGgrTW91YlBsWVhWRTRuTXM2YnNlR3kKdW14SXpuUzNCWjlUdVdXVm5ZUVVtUXBLUlowYXZ1cklpNXZub3FoOGVEWENwTm9lcmV6eDRJdVNheGdzUHRNNQptcWhmMTJyOUtTcDNvSXVwRStEY09iR25Gc3FHb2h2U2tHOWpkVFlQbWtPOVRFYVhhbVpzS29nYzJMVStKc09UCnJQOGVScS9aZ0VZNFpRNzI1WW8zaCtOV2NUTkxid0pMdTlHUkRtaDVYQk1KMHJYMzhycm1LZm4ySjE5QVV6NUkKRTRtaHBVQndyUHNZRVU5ZGErYWpPUG85UVBuNk5uUDBwRTVNSDNpKy9IWElhbURBRkhTbWZCMW50a1JkY2JSVwpmQzdYUHR1K1lvQTVKNkNBcEx5UUU3eVBJT0ZPUmRKUG5OMHQ2am93bVFLQmdRRDFxVTNzcENVVWQ1SHFCQUdhCmhzTnpXM2xJL3NDNVB1VXhvVWVxd3VpSUpYM2dyWDlpUFNnVXY0Z3VIRXZMUXlrMGhMeG8wVkgrNkJFdVR1WDMKV1piOW9tL2ZLWHRKYXpqbHFBUkFQdDgybEpoSkVwZzF5R2FRNjBDaU8xb3JTS2EyUzVMUVpRVGI4aHJweXZGUQpkU1JIb216Y3RWRHljZFYyVm5qQW1kdTkzd0tCZ1FESTRhM0hEbUpCTlV3b3VQc1Z6c21oS1FRM0lkT2N5aWlUCnQ2VTg5OC8vaUl2Z2VQS3Vxanc5blZBR0NIaW9DeGhqYXAxQTErNnFrbnNUTEdlVUhQTGJNUDFuUkdVRTBCK2QKZmlZakZFc2lzdDRZRDJxdVJXKy9uOGM0eGpubi94SnZpMURwNm8zTmZKMXNjcEtMMkl5dHIxLzljT1VaWXJ6UwovZGkvQkRyZUR3S0JnUUQxUzBONjJnQUlhc2d3OGlVanhoS2RPaVpsNDdKT2htWFdZNk1xK0FtMkFER3J5YkhiClJ4T2hmQW9mZUxPWjE0cnFYT3ZBZ2Rvcy9FNURmaGFVSUVuckltb3dXN3cxK0RGTTU3S3U3OWgwS0hYUzZSVkIKQnNTYlNidzFBYXlzY1pPOWpNS2hBVzJUclRDQVo5c0RLcVM2UG80UzU1MVhLS0VyMDNZcFlyZ080d0tCZ0IxVgpaeXprR3REdTJYb3cyT2xzVXVFbnZpZlcxckhVaTJ4V3F0aG1UNGMvQnozMksybjZEZVhwYk9BVXFKblJWUFJmCmd5c08zUmtuWHJXRURIUUNiaXczMFNrZFFhc2NRU0djWkRGSEsxbWJ5UGEyZVp1TkpDNVZSS0F6d2d6d29GNk4KZDNsUStQZ0N0SEk3b002dkJvdnVTaFFXUWo0Y3Z2b0llM2daUkFkZEFvR0FQc1Fob04xUFVMRHRzZy8vMXN5LwpWMUFkZjFtaDJjaWdKSzJRa2Z3TGx1OXZMdHpYQVZ5UFB3UE5QcVRMTFgyVzNRR0gxL3hGSzJMRDRmdVJtZkd5ClQ2dU5EUlp2UHRldG5ZbGxGWFdlSnI1NEVqb1QvWFprSzJwVFkya2UrQndqL3hVSXNlRmhvbUpQclFnalpOZGUKNzBYSFBFeEdqcG5zang5Y1ZMbUVJbmc9Ci0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0K
+
+     
